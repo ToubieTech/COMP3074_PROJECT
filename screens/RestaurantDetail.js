@@ -1,35 +1,55 @@
 import React from 'react';
-import  { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import  { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import Button from '../components/Button';
 import StarRating from '../components/StarRating';
 import Row from '../components/Row';
-import NavButton from '../components/NavButton';
 
 
-export default ({ navigation }) => {
+
+export default ({ route }) => {
+
+    const { restaurant, restaurantData, setRestaurantData} = route.params;
+    const navigation = useNavigation();
+
     const navigateToEditRestaurant = () => {
-        navigation.navigate('EditRestaurant')
+        navigation.navigate('EditRestaurant', {
+            restaurantData,
+            restaurant,
+            setRestaurantData,
+          });
+    } 
+
+    const deleteRestaurant = () => {
+        const updatedList = restaurantData.filter(item => item.id !== restaurant.id);
+        setRestaurantData(updatedList);
+
+        navigation.navigate('Restaurants');
     }
 
     const navigateToShowLocation = () => {
-        navigation.navigate('ShowLocation')
+        navigation.navigate('ShowLocation' , {
+            restaurantData,
+            restaurant,
+            setRestaurantData,
+          });
     }
 
 
    return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
         <View style={styles.rightEnd}>
             <TouchableOpacity>
                 <MaterialIcons style={styles.containerIcon} name='edit' size={24} color='#E6332C' onPress={navigateToEditRestaurant} />
             </TouchableOpacity>
             <TouchableOpacity>
-                <MaterialIcons style={styles.containerIcon} name='delete' size={24} color='#E6332C' />
+                <MaterialIcons style={styles.containerIcon} name='delete' size={24} color='#E6332C' onPress={deleteRestaurant} />
             </TouchableOpacity>
         </View>
 
         <View style={styles.innerContainer}>
-            <Text style={styles.textPrimary}>MOXIES</Text>
+            <Text style={styles.textPrimary}>{restaurant.name}</Text>
         </View>
 
         <View style={styles.horizontalRule}></View>
@@ -38,7 +58,7 @@ export default ({ navigation }) => {
             <Text style={styles.text22}>Address</Text>
         </View>
         <View style={styles.paddingLeft10}>
-            <Text style={[styles.marginLeft10, styles.marginBottom10, styles.text15]}>146, Kendal Avenue, Toronto, Ontario, Canada</Text>
+            <Text style={[styles.marginLeft10, styles.marginBottom10, styles.text15]}>{restaurant.address}</Text>
         </View>
         <View style={styles.marginLeft10}>
             <Button text='Show Location' size='medium' onPress={navigateToShowLocation} />
@@ -49,7 +69,7 @@ export default ({ navigation }) => {
             <Text style={styles.text22}>Phone</Text>
         </View>
         <View style={styles.paddingLeft10}>
-            <Text style={[styles.marginLeft10, styles.marginBottom10, styles.text15]}>(437)256-6713</Text>
+            <Text style={[styles.marginLeft10, styles.marginBottom10, styles.text15]}>{restaurant.phone}</Text>
         </View>
         
 
@@ -59,20 +79,17 @@ export default ({ navigation }) => {
         </View>
         <View style={styles.paddingLeft10}>
             <Text style={[styles.marginLeft10, styles.marginBottom10, styles.text15, styles.textJustify]}>
-            Etiam consectetur, justo a pulvinar volutpat, velit mauris dictum nisl, at condimentum risus velit sit amet dui. 
-            Donec eget enim commodo, tincidunt mauris ut, consequat dolor. Duis quis accumsan nibh. Vestibulum at libero scelerisque, 
-            egestas ipsum sit amet, vehicula dolor. Maecenas erat leo, bibendum in purus sed, facilisis hendrerit mauris. 
-            Nulla ullamcorper, nunc at rutrum aliquam, lorem odio auctor quam, et finibus magna sapien
+            {restaurant.description}
             </Text>
         </View>
 
         <View style={styles.row}>
             <View style={styles.tag}>
-                <Text style={styles.tagText}>Vegan</Text>
+                <Text style={styles.tagText}>{restaurant.tags}</Text>
             </View>
         </View>
         
-        <View style={styles.center}><StarRating type='rated' /></View>
+        <View style={styles.center}><StarRating type="rated" rating={restaurant.rating} /></View>
         <View style={[styles.center, styles.marginTop10]}>
             <Text>Share On:</Text>
             <Row>
@@ -82,9 +99,7 @@ export default ({ navigation }) => {
             </Row>
         </View>
 
-        <NavButton />
-
-    </View>
+    </ScrollView>
    ); 
 }
 

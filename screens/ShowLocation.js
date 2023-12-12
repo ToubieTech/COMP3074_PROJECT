@@ -1,17 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {View, StyleSheet, Text} from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, Polyline } from 'react-native-maps';
+import { useNavigation } from '@react-navigation/native';
+import * as Location from 'expo-location';
 import Button from '../components/Button';
-import NavButton from '../components/NavButton';
 
-export default ({Navigation}) => {
+
+export default ({Navigation, route}) => {
+  const { restaurant } = route.params;
+  const [address, setAddress] = useState(restaurant.address);
+  const navigation = useNavigation();
+
+  const [location, setLocation] = useState({
+    longitude: -79.4096960,
+    latitude: 43.6796272,
+  });
+
+  const [routeCoordinates, setRouteCoordinates] = useState([]);
+
+  const getLocationFromAddress = async () => {
+    try {
+      const geoLocation = await Location.geocodeAsync(address);
+      if (geoLocation && geoLocation.length > 0) {
+        setLocation(geoLocation[0]);
+        setRouteCoordinates([
+          { latitude: location.latitude, longitude: location.longitude },
+          { latitude: geoLocation[0].latitude, longitude: geoLocation[0].longitude },
+        ]);
+      }
+    } catch (error) {
+      console.error('Error fetching location: ', error);
+    }
+  };
+
+  useEffect(() => {
+    getLocationFromAddress();
+  }, [address]);
+
     const navigateToGetDirection = () => {
         Navigation.navigate('GetDirection')
     }
     return(
         <View style={styles.container}>
             <View style={styles.row}>
-                <Text style={styles.textPrimary}>MOXIES</Text>
+                <Text style={styles.textPrimary}>{restaurant.name}</Text>
                 <Button text='Get Direction' onPress={navigateToGetDirection} />
 
             </View>
@@ -34,8 +66,15 @@ export default ({Navigation}) => {
           description="Marker Description"
         />
 
+         {/* Marker for the restaurant */}
+         <Marker coordinate={{ latitude: location.latitude, longitude: location.longitude }} />
 
-        <NavButton />
+{/* Polyline to show the route */}
+<Polyline
+  coordinates={routeCoordinates}
+  strokeColor="#3498db"
+  strokeWidth={10}
+/>
 
         </View>
     );

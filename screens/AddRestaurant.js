@@ -1,18 +1,72 @@
 import React, { useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, ScrollView, Text, Alert } from "react-native";
+import { useNavigation } from '@react-navigation/native';
+
 import Button from "../components/Button";
 import Input from "../components/Input";
-import NavButton from "../components/NavButton";
+import StarRating from "../components/StarRating";
 
-export default function AddRestaurant() {
-    const [name, setName] = useState('')
-    const [phone, setPhone] = useState('')
-    const [address, setAddress] = useState('')
-    const [desc, setDesc] = useState('')
-    const [tag, setTag] = useState('')
+
+
+export default function AddRestaurant({ route }) {
+
+
+  const navigation = useNavigation();
+  const {restaurantData, setRestaurantData}=route.params
+
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [address, setAddress] = useState('')
+  const [desc, setDesc] = useState('')
+  const [tag, setTag] = useState('')
+
+  const [rating, setRating] = useState(0);
+
+  const handleRating = (selectedRating) => {
+    setRating(selectedRating);
+  };
+
+
+  
+  const addItem = (newItemData) => {
+    const updatedList = [...restaurantData, newItemData];
+    setRestaurantData(updatedList);
+  };
+
+ 
+
+  const handleAddRestaurant = () => {
+    console.log('Creating Post:', { name, phone, address, desc, tag, rating });
+    const newId = restaurantData.length > 0 ? Math.max(...restaurantData.map(item => item.id)) + 1 : 1;
+    const newRestaurant={
+      'id': newId,
+      'name':name,
+      'phone':phone,
+      'address':address,
+      'description':desc,
+      'tags':tag,
+      'rating':rating
+    }
+    try{
+      addItem(newRestaurant)
+
+    }catch (e) {
+      console.log(e)
+    }
+
+    // Clear form fields and rating after submission
+    setName('');
+    setPhone('');
+    setAddress('');
+    setDesc('');
+    setTag('');
+    setRating(0);
+    navigation.navigate('Restaurants')
+  };
+   
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
           <View style={styles.innerContainer}>
             <Text style={styles.textPrimary}>ADD RESTAURANT</Text>
             <View style={styles.horizontalRule}></View>
@@ -34,16 +88,15 @@ export default function AddRestaurant() {
             <Input placeholder='Enter restaurant tag' inputLabel='Enter restaurant tag (can be separated by comma):' 
                 inputName={tag} onChangeText={(text) => setTag(text)}/>
 
-            <Input inputLabel='Rate restaurant:' 
-                inputName={tag} inputType='rating' onChangeText={(text) => setTag(text)}/>
+        <Text style={styles.inputLabel}>Rate restaurant:</Text>
+          <StarRating type="unrated" rating={rating} onRatingPress={handleRating} />
             
-            <Button text='ADD' size='large' />
+            <Button text='ADD' size='large' onPress={handleAddRestaurant} />
             
             </View>
            
         </View>
-        <NavButton />
-        </View>
+        </ScrollView>
     );
 }
 

@@ -1,16 +1,52 @@
 import React, { useState } from "react";
 import { StyleSheet, View, Text } from "react-native";
+import {useNavigation} from "@react-navigation/native";
 import Button from "../components/Button";
 import Input from "../components/Input";
-import NavButton from "../components/NavButton";
+import StarRating from "../components/StarRating";
 
 
-export default function EditRestaurant() {
-    const [name, setName] = useState('')
-    const [phone, setPhone] = useState('')
-    const [address, setAddress] = useState('')
-    const [desc, setDesc] = useState('')
-    const [tag, setTag] = useState('')
+
+export default function EditRestaurant({route}) {
+  const navigation=useNavigation();
+  const {restaurantData, restaurant, setRestaurantData}=route.params
+  const [name, setName] = useState(restaurant.name || "");
+  const [phone, setPhone] = useState(restaurant.phone || "");
+  const [address, setAddress] = useState(restaurant.address || "");
+  const [desc, setDesc] = useState(restaurant.description || "");
+  const [tag, setTag] = useState(restaurant.tags || "");
+  const [rating, setRating] = useState(restaurant.rating || 0);
+
+
+  function updateItem(itemName, updatedData){
+    const updatedList = restaurantData.map(item => {
+      if (item.name === itemName) {
+        return { ...item, ...updatedData };
+      }
+      return item;
+    });
+
+    setRestaurantData(updatedList);
+  }
+
+
+  const handleEditRestaurant = () => {
+    console.log('Editting Post:', { name, address, desc, phone, tag, rating });
+    try {
+      updateItem(restaurant.id, {
+        'name': name,
+        'description': desc,
+        'address': address,
+        'phone': phone,
+        'rating': rating,
+        'tags':tag
+      })
+    }catch (e) {
+      console.log(e)
+    }
+    navigation.navigate('Restaurants')
+  };
+    
 
     return (
         <View style={styles.container}>
@@ -35,15 +71,14 @@ export default function EditRestaurant() {
             <Input placeholder='Enter restaurant tag' inputLabel='Enter restaurant tag (can be separated by comma):' 
                 inputName={tag} onChangeText={(text) => setTag(text)}/>
 
-            <Input inputLabel='Rate restaurant:' 
-                inputName={tag} inputType='rating' onChangeText={(text) => setTag(text)}/>
+          <Text style={styles.inputLabel}>Rate restaurant:</Text>
+          <StarRating type="unrated" rating={rating} onRatingPress={setRating} />
             
-            <Button text='EDIT' size='large' />
+            <Button text='EDIT' size='large' onPress={handleEditRestaurant} />
             
             </View>
            
         </View>
-        <NavButton />
         </View>
     );
 }

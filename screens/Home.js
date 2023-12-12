@@ -1,7 +1,6 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet } from "react-native";
 import Button from '../components/Button';
-import NavButton from "../components/NavButton";
 
 const imageLogo = require('../images/logo.png');
 const imageHome = require('../images/home.png');
@@ -14,6 +13,7 @@ export default ({ navigation }) =>  {
     const navigateToAbout = () => {
         navigation.navigate("About");
     };
+  
     return (
         <View style={styles.container}>
             <View style={styles.imageContainer}>
@@ -25,9 +25,10 @@ export default ({ navigation }) =>  {
                 <Text style={[styles.text, styles.textCenter, styles.marginBottom35]}>For anyone who loves dining out and exploring new culinary experiences</Text>
                 <Button onPress={navigateToRestaurant} text="GET STARTED" type="roundBtn" />
                 <Button onPress={navigateToAbout} text="ABOUT US" type="roundBtn" style={{marginTop: 15}} />
+        
                 
             </View>
-            <NavButton />
+         
         </View>
     );
 }

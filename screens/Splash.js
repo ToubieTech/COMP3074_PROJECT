@@ -9,7 +9,7 @@ export default ({ navigation }) =>  {
   useEffect(()=> {
     const timer = setTimeout(() => {
       navigation.replace("Home");
-    }, 2000);
+    }, 15000);
 
     return () => {clearTimeout(timer)}
   }, [navigation])
